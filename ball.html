@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+      body {
+          background-color: white;
+      }
+	  canvas {
+		border-style: solid;
+	  }
+    </style>
+
+  </head>
+
+  <body>
+	<h1>Conor Shortt</h1>
+    <canvas id="canvas-for-ball"></canvas>
+
+    <script type="text/javascript">
+      // Gets a handle to the element with id canvasOne.
+      var canvas = document.getElementById("canvas-for-ball");
+      // Get a 2D context for the canvas.
+      var ctx = canvas.getContext("2d");
+	  var x, y, xspeed, yspeed;
+	  var a, b;
+	  
+	  //Ball class
+	  class Ball {
+		constructor(x, y, xspeed, yspeed) {
+			this.x = x;
+			this.y = y;
+			this.xspeed = xspeed;
+			this.yspeed = yspeed;
+		}
+		draw(){
+			ctx.beginPath();
+			ctx.arc(50, this.y, 10, 0, 2 * Math.PI);
+			ctx.moveTo(50, (this.y-10));
+			ctx.lineTo(50, (this.y+10));
+			a = (10 * Math.cos(Math.PI * 1/4) + 50);
+			b = 10 * Math.sin(Math.PI * 1/4);
+			ctx.moveTo(50, this.y);
+			ctx.lineTo(a, (b +this.y));
+			a = (10 * Math.cos(Math.PI * 3/4) + 50);
+			b = 10 * Math.sin(Math.PI * 3/4);
+			ctx.moveTo(50, this.y);
+			ctx.lineTo(a, (b +this.y));
+			ctx.lineWidth = 2;
+			ctx.stroke();
+		}
+		move(){
+			// Update the y location.
+			this.y += this.yspeed;	
+			if(this.y > 140) {
+				this.yspeed *= -1;
+			} else if(this.y < 10) {
+				this.yspeed *= -1;
+			}
+			// Update the x location.
+			this.x += this.xspeed;	
+			/*if(this.x > 140) {
+				this.xspeed *= -1;
+			} else if(this.x < 10) {
+				this.xspeed *= -1;
+			}*/
+		}
+	  }
+	  
+      // A function to repeat every time the animation loops.
+      const theBall = new Ball(0, 20, 10, 1);
+	  function repeatme() {
+	  	ctx.clearRect(0, 0, 350, 150);
+
+		theBall.draw();
+		theBall.move();
+		
+        window.requestAnimationFrame(repeatme);
+      }
+      
+      // Get the animation going.
+      repeatme();
+	</script>
+
+  </body>
+
+</html>
