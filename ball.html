@@ -24,10 +24,15 @@
 
     <script type="text/javascript">
       // Gets a handle to the element with id canvasOne.
-			// Canvas default dimensions, Width = 350 Height = 150
+			// Canvas default dimensions, Width = 300 Height = 150
       var canvas = document.getElementById("canvas-for-ball");
       // Get a 2D context for the canvas.
       var ctx = canvas.getContext("2d");
+
+		//Variables & Constants
+		const width = 300;
+		const height = 150;
+		const radius = 10;
 	  var x, y, xspeed, yspeed;
 	  var a, b;
 	  
@@ -41,15 +46,15 @@
 			}
 			draw(){
 				ctx.beginPath();
-				ctx.arc(this.x, this.y, 10, 0, 2 * Math.PI);
-				ctx.moveTo(this.x, (this.y-10));
-				ctx.lineTo(this.x, (this.y+10));
-				a = (10 * Math.cos(Math.PI * 1/4) + this.x);
-				b = 10 * Math.sin(Math.PI * 1/4);
+				ctx.arc(this.x, this.y, radius, 0, 2 * Math.PI);
+				ctx.moveTo(this.x, (this.y-radius));
+				ctx.lineTo(this.x, (this.y+radius));
+				a = (radius * Math.cos(Math.PI * 1/4) + this.x);
+				b = radius * Math.sin(Math.PI * 1/4);
 				ctx.moveTo(this.x, this.y);
 				ctx.lineTo(a, (b +this.y));
-				a = (10 * Math.cos(Math.PI * 3/4) + this.x);
-				b = 10 * Math.sin(Math.PI * 3/4);
+				a = (radius * Math.cos(Math.PI * 3/4) + this.x);
+				b = radius * Math.sin(Math.PI * 3/4);
 				ctx.moveTo(this.x, this.y);
 				ctx.lineTo(a, (b +this.y));
 				ctx.lineWidth = 2;
@@ -58,33 +63,31 @@
 			move(){
 				// Update the y location.
 				this.y += this.yspeed;
-				if(this.y > 140) {
+				if(this.y > (height-radius)) {
 					this.yspeed *= -1;
-				} else if(this.y < 10) {
+				} else if(this.y < radius) {
 					this.yspeed *= -1;
 				}
 				// Update the x location.
 				this.x += this.xspeed;
 				if(this.x > 290) {
 					this.xspeed *= -1;
-				} else if(this.x < 10) {
+				} else if(this.x < radius) {
 					this.xspeed *= -1;
 				}
 			}
 	  }
 	  
       // A function to repeat every time the animation loops.
-      const theBall = new Ball(10, 20, 1, 1);
-			console.log(theBall.xspeed);
-			console.log(theBall.x);
-	  function repeatme() {
-	  	ctx.clearRect(0, 0, 350, 150);
+			const theBall = new Ball(radius, 20, 1, 1);
+			function repeatme() {
+			ctx.clearRect(0, 0, width, height);
 
-		theBall.draw();
-		theBall.move();
-		
-        window.requestAnimationFrame(repeatme);
-      }
+			theBall.draw();
+			theBall.move();
+			
+			window.requestAnimationFrame(repeatme);
+		}
       
       // Get the animation going.
       repeatme();
