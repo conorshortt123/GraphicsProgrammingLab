@@ -29,12 +29,17 @@
       // Get a 2D context for the canvas.
       var ctx = canvas.getContext("2d");
 
-		//Variables & Constants
-		const width = 300;
-		const height = 150;
-		const radius = 10;
+	  //Variables & Constants
+	  const width = 300;
+	  const height = 150;
+	  const radius = 10;
 	  var x, y, xspeed, yspeed;
 	  var a, b;
+	  var circleRadian = 2;
+	  var middleBottom = 0.5;
+	  var middleTop = 1.5;
+	  var line1Radian = 0.25;
+	  var line2Radian = 0.75;
 	  
 	  //Ball class
 	  class Ball {
@@ -46,17 +51,28 @@
 			}
 			draw(){
 				ctx.beginPath();
-				ctx.arc(this.x, this.y, radius, 0, 2 * Math.PI);
-				ctx.moveTo(this.x, (this.y-radius));
-				ctx.lineTo(this.x, (this.y+radius));
-				a = (radius * Math.cos(Math.PI * 1/4) + this.x);
-				b = radius * Math.sin(Math.PI * 1/4);
+				//Circle
+				ctx.arc(this.x, this.y, radius, 0, circleRadian * Math.PI);
+				//Middle Line
+				ctx.moveTo(this.x, this.y);
+				a = (radius * Math.cos(Math.PI * middleBottom) + this.x);
+				b = radius * Math.sin(Math.PI * middleBottom);
+				ctx.lineTo(a, (b+this.y));
+				ctx.moveTo(this.x, this.y);
+				a = (radius * Math.cos(Math.PI * middleTop) + this.x);
+				b = radius * Math.sin(Math.PI * middleTop);
+				ctx.lineTo(a, (b+this.y));
+				//First 45 degree line
+				a = (radius * Math.cos(Math.PI * line1Radian) + this.x);
+				b = radius * Math.sin(Math.PI * line1Radian);
 				ctx.moveTo(this.x, this.y);
 				ctx.lineTo(a, (b +this.y));
-				a = (radius * Math.cos(Math.PI * 3/4) + this.x);
-				b = radius * Math.sin(Math.PI * 3/4);
+				//Second
+				a = (radius * Math.cos(Math.PI * line2Radian) + this.x);
+				b = radius * Math.sin(Math.PI * line2Radian);
 				ctx.moveTo(this.x, this.y);
 				ctx.lineTo(a, (b +this.y));
+				
 				ctx.lineWidth = 2;
 				ctx.stroke();
 			}
@@ -76,15 +92,25 @@
 					this.xspeed *= -1;
 				}
 			}
+			rotate(){
+				var rotateSpeed = 0.01;
+				circleRadian += rotateSpeed;
+				line1Radian += rotateSpeed;
+				line2Radian += rotateSpeed;
+				middleTop += rotateSpeed;
+				middleBottom += rotateSpeed;
+			
+			}
 	  }
 	  
       // A function to repeat every time the animation loops.
-			const theBall = new Ball(radius, 20, 1, 1);
+			const theBall = new Ball(radius, 20, 1, 1, 0.01);
 			function repeatme() {
 			ctx.clearRect(0, 0, width, height);
 
 			theBall.draw();
 			theBall.move();
+			theBall.rotate();
 			
 			window.requestAnimationFrame(repeatme);
 		}

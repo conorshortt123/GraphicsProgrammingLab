@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html>
+
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+		canvas {
+			border: 1px solid grey; 
+		}
+    </style>
+
+  </head>
+
+  <body>
+
+    <canvas id="canvas-for-ball"></canvas>
+
+    <script type="text/javascript">
+		// Gets a handle to the element with id canvasOne.
+		var canvas = document.getElementById("canvas-for-ball");
+		// Get a 2D context for the canvas.
+		var ctx = canvas.getContext("2d");
+		// Make the fill style red.
+		ctx.fillStyle = "rgb(255, 0, 0)";
+		
+		//Variables & Constants
+	    const width = 300;
+	    const height = 150;
+	    const radius = 10;
+	    var x, y, xspeed, yspeed;
+		const gravity = 0.15;
+		var a, b;
+		var circleRadian = 2;
+		var middleBottom = 0.5;
+		var middleTop = 1.5;
+		var line1Radian = 0.25;
+		var line2Radian = 0.75;
+		
+		//Ball class
+		class Ball {
+			constructor(x, y, xspeed, yspeed) {
+				this.x = x;
+				this.y = y;
+				this.xspeed = xspeed;
+				this.yspeed = yspeed;
+			}
+			draw(){
+				ctx.beginPath();
+				//Circle
+				ctx.arc(this.x, this.y, radius, 0, circleRadian * Math.PI);
+				//Middle Line
+				ctx.moveTo(this.x, this.y);
+				a = (radius * Math.cos(Math.PI * middleBottom) + this.x);
+				b = radius * Math.sin(Math.PI * middleBottom);
+				ctx.lineTo(a, (b+this.y));
+				ctx.moveTo(this.x, this.y);
+				a = (radius * Math.cos(Math.PI * middleTop) + this.x);
+				b = radius * Math.sin(Math.PI * middleTop);
+				ctx.lineTo(a, (b+this.y));
+				//First 45 degree line
+				a = (radius * Math.cos(Math.PI * line1Radian) + this.x);
+				b = radius * Math.sin(Math.PI * line1Radian);
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(a, (b +this.y));
+				//Second
+				a = (radius * Math.cos(Math.PI * line2Radian) + this.x);
+				b = radius * Math.sin(Math.PI * line2Radian);
+				ctx.moveTo(this.x, this.y);
+				ctx.lineTo(a, (b +this.y));
+				
+				ctx.lineWidth = 2;
+				ctx.stroke();
+			}
+			move(){
+				// Update the y location.
+				this.y += this.yspeed;
+				this.yspeed += gravity;
+				if(this.y > (height-radius)) {
+					this.yspeed *= -1;
+				} else if(this.y < radius) {
+					this.yspeed *= -1;
+				}
+				// Update the x location.
+				this.x += this.xspeed;
+				if(this.x > 290) {
+					this.xspeed *= -1;
+				} else if(this.x < radius) {
+					this.xspeed *= -1;
+				}
+			}
+			rotate(){
+				var rotateSpeed = 0.01;
+				circleRadian += rotateSpeed;
+				line1Radian += rotateSpeed;
+				line2Radian += rotateSpeed;
+				middleTop += rotateSpeed;
+				middleBottom += rotateSpeed;
+			
+			}
+		}
+		
+		var theBall = new Ball(10, 50, 1, 1);
+		
+		/*var canvasPos = {
+		x: canvas.offsetLeft,
+		y: canvas.offsetTop
+		}
+		
+		$(canvas.body).click(function(e) {
+			var mouse = {
+				x:event.clientX - canvasPos.x,
+				y:event.clientY - canvasPos.y
+			}
+			
+			ctx.beginPath();
+			ctx.arc(mouse.x, mouse.y, 6, 0, 2 * Math.PI);
+			ctx.fill();
+			
+			console.log(e);
+		});*/
+		
+		//keypresses with jQuery
+		function repeatme() {
+			ctx.clearRect(0, 0, width, height);
+
+			theBall.draw();
+			theBall.move();
+			theBall.rotate();
+			
+			window.requestAnimationFrame(repeatme);
+		}
+		repeatme();
+		
+		$(document.body).on('keydown', function(e2) {
+			console.log(e2.which);
+			switch (e2.which) {
+			case 32:
+				break;
+			// key code for left arrow
+			case 65:
+				console.log('a key pressed!');
+				theBall.xspeed -= 1;
+				break;
+			// key code for right arrow
+			case 68:
+				console.log('d key pressed!');
+				theBall.xspeed += 1;
+				break;
+			// key code for up arrow
+			case 87:
+				console.log('w key pressed!');
+				theBall.yspeed -= 1;
+				break;
+			// key code for down arrow
+			case 83:
+				console.log('s key pressed!');
+				theBall.yspeed += 1;
+				break;
+			}
+			
+			
+		});
+		
+		var canvasPos = {
+			x: canvas.offsetLeft,
+			y: canvas.offsetTop
+		}
+		
+		$( "#canvas-for-ball" ).dblclick(function() {
+			var mouse = {
+				x:event.pageX - canvasPos.x,
+				y:event.pageY - canvasPos.y
+			}
+			
+			ctx.clearRect(0, 0, width, height);
+			theBall.x = (mouse.x);
+			theBall.y = (mouse.y);
+			theBall.xspeed = 1;
+			theBall.yspeed = 1;
+		});
+    </script>
+
+  </body>
+
+</html>
