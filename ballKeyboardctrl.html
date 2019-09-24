@@ -16,6 +16,13 @@
   </head>
 
   <body>
+    <h4>CONTROLS</h4>
+    <p>
+    -WSAD to increase speed in respective direction.
+    <br>-SPACE to change rotation direction.
+    <br>-Double click to reposition.
+    <br>-R to increase rotational velocity & T to decrease.
+    </p>
 
     <canvas id="canvas-for-ball"></canvas>
 
@@ -32,7 +39,7 @@
 	    const height = 150;
 	    const radius = 10;
 	    var x, y, xspeed, yspeed, rotateSpeed;
-		const gravity = 0.15;
+		const gravity = 0.1;
 		var a, b;
 		var circleRadian = 2;
 		var middleBottom = 0.5;
@@ -82,6 +89,13 @@
 				this.yspeed += gravity;
 				if(this.y > (height-radius)) {
 					this.yspeed *= -1;
+                    this.yspeed *= 0.9;
+                    if(this.yspeed > -0.9){
+                        this.yspeed = 0;
+                        this.rotateSpeed = 0;
+                        this.xspeed *= 0.99;
+                    }
+                    console.log(this.yspeed);
 				} else if(this.y < radius) {
 					this.yspeed *= -1;
 				}
@@ -102,25 +116,11 @@
 			}
 		}
 		
-		var theBall = new Ball(10, 50, 1, 1, 0.01);
-		
-		/*var canvasPos = {
-		x: canvas.offsetLeft,
-		y: canvas.offsetTop
-		}
-		
-		$(canvas.body).click(function(e) {
-			var mouse = {
-				x:event.clientX - canvasPos.x,
-				y:event.clientY - canvasPos.y
-			}
-			
-			ctx.beginPath();
-			ctx.arc(mouse.x, mouse.y, 6, 0, 2 * Math.PI);
-			ctx.fill();
-			
-			console.log(e);
-		});*/
+        var randX = Math.floor(Math.random() * 300);
+        var randY = Math.floor(Math.random() * 100);
+        
+		var theBall = new Ball(randX, randY, 1, 0, 0.01);
+        var otherBall = new Ball(200, 100, 1.5, 0, 0.01);
 		
 		//keypresses with jQuery
 		function repeatme() {
@@ -129,6 +129,10 @@
 			theBall.draw();
 			theBall.move();
 			theBall.rotate();
+                   
+            otherBall.draw();
+			otherBall.move();
+			otherBall.rotate();
 			
 			window.requestAnimationFrame(repeatme);
 		}
@@ -137,31 +141,40 @@
 		$(document.body).on('keydown', function(e2) {
 			console.log(e2.which);
 			switch (e2.which) {
+            // key code for space key
 			case 32:
 				theBall.rotateSpeed *= -1;
 				break;
-			// key code for left arrow
+			// key code for a key
 			case 65:
 				console.log('a key pressed!');
 				theBall.xspeed -= 1;
 				break;
-			// key code for right arrow
+			// key code for d key
 			case 68:
 				console.log('d key pressed!');
 				theBall.xspeed += 1;
 				break;
-			// key code for up arrow
+			// key code for w key
 			case 87:
 				console.log('w key pressed!');
 				theBall.yspeed -= 1;
 				break;
-			// key code for down arrow
+			// key code for s key
 			case 83:
 				console.log('s key pressed!');
 				theBall.yspeed += 1;
 				break;
-			}
-			
+            case 82:
+                console.log('r key pressed!');
+                theBall.rotateSpeed += 0.001;
+                break;
+            case 84:
+                console.log('t key pressed!');
+                theBall.rotateSpeed -= 0.001;
+                break;
+            
+           }	
 			
 		});
 		
@@ -181,6 +194,13 @@
 			theBall.y = (mouse.y);
 			theBall.xspeed = 1;
 			theBall.yspeed = 1;
+            theBall.rotateSpeed = 0.01;
+            
+            otherBall.x = (mouse.x);
+			otherBall.y = (mouse.y);
+			otherBall.xspeed = 1.4;
+			otherBall.yspeed = 1.4;
+            otherBall.rotateSpeed = 0.01;
 		});
     </script>
 
