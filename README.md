@@ -1,7 +1,7 @@
-"# GraphicsProgrammingLab2" 
+"# GraphicsProgrammingLab2" <br/><br/>
 
-CONTROLS:
--WSAD to increase speed in respective key direction.
--SPACE to change rotation direction.
--Double click to reposition.
+CONTROLS:<br/>
+-WSAD to increase speed in respective key direction.<br/>
+-SPACE to change rotation direction.<br/>
+-Double click to reposition.<br/>
 -R to increase rotational velocity & T to decrease.
