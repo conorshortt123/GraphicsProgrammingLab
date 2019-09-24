@@ -31,7 +31,7 @@
 	    const width = 300;
 	    const height = 150;
 	    const radius = 10;
-	    var x, y, xspeed, yspeed;
+	    var x, y, xspeed, yspeed, rotateSpeed;
 		const gravity = 0.15;
 		var a, b;
 		var circleRadian = 2;
@@ -42,11 +42,12 @@
 		
 		//Ball class
 		class Ball {
-			constructor(x, y, xspeed, yspeed) {
+			constructor(x, y, xspeed, yspeed, rotateSpeed) {
 				this.x = x;
 				this.y = y;
 				this.xspeed = xspeed;
 				this.yspeed = yspeed;
+				this.rotateSpeed = rotateSpeed;
 			}
 			draw(){
 				ctx.beginPath();
@@ -93,17 +94,15 @@
 				}
 			}
 			rotate(){
-				var rotateSpeed = 0.01;
-				circleRadian += rotateSpeed;
-				line1Radian += rotateSpeed;
-				line2Radian += rotateSpeed;
-				middleTop += rotateSpeed;
-				middleBottom += rotateSpeed;
-			
+				circleRadian += this.rotateSpeed;
+				line1Radian += this.rotateSpeed;
+				line2Radian += this.rotateSpeed;
+				middleTop += this.rotateSpeed;
+				middleBottom += this.rotateSpeed;
 			}
 		}
 		
-		var theBall = new Ball(10, 50, 1, 1);
+		var theBall = new Ball(10, 50, 1, 1, 0.01);
 		
 		/*var canvasPos = {
 		x: canvas.offsetLeft,
@@ -139,6 +138,7 @@
 			console.log(e2.which);
 			switch (e2.which) {
 			case 32:
+				theBall.rotateSpeed *= -1;
 				break;
 			// key code for left arrow
 			case 65:
