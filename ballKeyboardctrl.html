@@ -9,7 +9,8 @@
 
     <style type="text/css">
 		canvas {
-			border: 1px solid grey; 
+			border: 2px solid red;
+			background-color: black;
 		}
     </style>
 
@@ -24,45 +25,49 @@
     <br>-R to increase rotational velocity & T to decrease.
     </p>
 
-    <canvas id="canvas-for-ball"></canvas>
+    <canvas id="canvas-for-ball" width="600" height="300"></canvas>
 
     <script type="text/javascript">
 		// Gets a handle to the element with id canvasOne.
 		var canvas = document.getElementById("canvas-for-ball");
 		// Get a 2D context for the canvas.
 		var ctx = canvas.getContext("2d");
-		// Make the fill style red.
-		ctx.fillStyle = "rgb(255, 0, 0)";
-		
+
 		//Variables & Constants
-	    const width = 300;
-	    const height = 150;
-	    const radius = 10;
+	    const width = 600;
+	    const height = 300;
+	    var radius = 20;
 	    var x, y, xspeed, yspeed, rotateSpeed;
-		const gravity = 0.1;
+		const gravity = 0.05;
 		var a, b;
 		var circleRadian = 2;
 		var middleBottom = 0.5;
 		var middleTop = 1.5;
 		var line1Radian = 0.25;
 		var line2Radian = 0.75;
+		var randX;
+		var randY;
 		
-		var color;
-		var mass = 1;
+		var energyLoss = 0.9;
+		var mass = radius / 10;
 		var num;
 		var distance;
-		
+		var r, g, b;
+		var color;
+		var a, u1, u2, d1, d2, m1, m2;
+		var v1x, v1y, v2x, v2y, f1x, f2x, newXVel1, newYVel1, newXVel2, newYVel2;
+
 		//Ball class
 		class Ball {
-			constructor(x, y, xspeed, yspeed, rotateSpeed, mass, color, num) {
+			constructor(x, y, xspeed, yspeed, radius, rotateSpeed, mass, color) {
 				this.x = x;
 				this.y = y;
 				this.xspeed = xspeed;
 				this.yspeed = yspeed;
+				this.radius = radius;
 				this.rotateSpeed = rotateSpeed;
 				this.mass = mass;
 				this.color = color;
-				this.num = num;
 			}
 			draw(){
 				ctx.beginPath();
@@ -87,22 +92,7 @@
 				b = radius * Math.sin(Math.PI * line2Radian);
 				ctx.moveTo(this.x, this.y);
 				ctx.lineTo(a, (b +this.y));		
-				ctx.lineWidth = 2;
-				
-				switch(this.num){
-					case 1:
-						this.color = 'red';
-						break;
-					case 2:
-						this.color = 'green';
-						break;
-					case 3:
-						this.color = 'blue';
-						break;
-					case 4:
-						this.color = 'yellow';
-						break;
-				}
+				ctx.lineWidth = 3;
 				
 				ctx.strokeStyle = this.color;
 				ctx.stroke();
@@ -112,23 +102,29 @@
 				this.y += this.yspeed;
 				//gravity is const
 				this.yspeed += gravity;
-				if(this.y > (height-radius)) {
+				if(this.y >= (height-radius)) {
 					this.yspeed *= -1;
-                    this.yspeed *= 0.9;
-                    if(this.yspeed > -0.9){
+					//Kinetic energy loss. (90%)
+                    this.yspeed *= energyLoss;
+					//Checks if y velocity is excessively low, (between 1 and -1) and sets to 0 if true.
+					//Also decreases rotation velocity and x velocity.
+                    /*if(this.yspeed < 1 && this.yspeed > -1){
                         this.yspeed = 0;
-                        this.rotateSpeed = 0;
+                        this.rotateSpeed *= 0.99;
                         this.xspeed *= 0.99;
-                    }
-				} else if(this.y < radius) {
+                    }*/
+				} else if(this.y <= radius) {
 					this.yspeed *= -1;
+					this.yspeed *= energyLoss;
 				}
 				// Update the x location.
 				this.x += this.xspeed;
-				if(this.x > 290) {
+				if(this.x >= (width-radius)) {
 					this.xspeed *= -1;
-				} else if(this.x < radius) {
+					this.xspeed *= energyLoss;
+				} else if(this.x <= radius) {
 					this.xspeed *= -1;
+					this.xspeed *= energyLoss;
 				}
 			}
 			rotate(){
@@ -138,14 +134,40 @@
 				middleTop += this.rotateSpeed;
 				middleBottom += this.rotateSpeed;
 			}
+			relocate(){
+				randXY();
+				this.x = randX;
+				this.y = randY;
+			}
+		}
+
+		//Random color function
+		function randColor() {
+
+			r = Math.ceil(Math.random() * 255);
+			g = Math.ceil(Math.random() * 255);
+			b = Math.ceil(Math.random() * 255);
+
+			color = "rgba(" + r + ", " + g + ", " + b + ", 1)";
 		}
 		
-        var randX = Math.floor(Math.random() * (width - 20));
-        var randY = Math.floor(Math.random() * (height - 20));
+		//Random X and Y coordinates
+		function randXY(){
+			randX = Math.ceil(Math.random() * 550);
+        	randY = Math.ceil(Math.random() * 250);
+
+			if(randX < 20)
+			randX += 20;
+			if(randY < 20)
+			randY += 20;
+		}
 		
-		num = Math.ceil(Math.random() * 3);
-		var b1 = new Ball(randX, randY, 1.5, 0, 0.01, 2, 0, num);
-        var b2 = new Ball(200, 100, 1, 0, 0.01, 2, 0, 4);
+        randXY();
+		randColor();
+		var b1 = new Ball(randX, randY, 1.5, 1, 20, 0.01, 2, color);
+		randXY();
+        randColor();
+		var b2 = new Ball(randX, randY, 1.5, 1, 20, 0.01, 2, color);
 		
 		//keypresses with jQuery
 		function repeatme() {
@@ -159,12 +181,12 @@
 			b2.move();
 			b2.rotate();
 			
-			checkCollisions();
+			checkCollision();
 			
 			window.requestAnimationFrame(repeatme);
 		}
 		
-		function checkCollisions() {
+		function checkCollision() {
 			var x3 = b2.x - b1.x;
 			var y3 = b2.y - b1.y;
 			var x3sqrd = Math.pow(x3, 2);
@@ -172,9 +194,62 @@
 			var radiiSum = radius * 2;
 			
 			distance = Math.sqrt(x3sqrd + y3sqrd);
-			if(distance < radiiSum){
+
+			if(distance <= (radiiSum)){
+				//Collision detected
 				console.log("collision");
-				
+
+				//Random color for each ball.
+				randColor();
+				b1.color = color;
+				randColor();
+				b2.color = color;
+
+				//Calculate collision angle (a)
+				a = Math.atan2((b1.y - b2.y)-0.5, (b2.x - b2.y)-0.5);
+				console.log("collision angle = " + a);
+				//Calculate magnitude (u)
+				u1 = Math.sqrt(Math.pow(b1.xspeed, 2) + Math.pow(b1.yspeed, 2));
+				u2 = Math.sqrt(Math.pow(b2.xspeed, 2) + Math.pow(b2.yspeed, 2));
+				console.log("b1 magnitude = " + u1);
+				console.log("b2 magnitude = " + u2);
+				//Calculate direction (d)
+				d1 = Math.atan2(b1.yspeed, b1.xspeed);
+				console.log("d1 = " + d1);
+				d2 = Math.atan2(b2.yspeed, b2.xspeed);
+				console.log("d2 = " + d2);
+				//Calculate x/y velocity
+				v1x = u1 * Math.cos(d1 - a);
+				v1y = u1 * Math.sin(d1 - a);
+				v2x = u2 * Math.cos(d2 - a);
+				v2y = u2 * Math.sin(d2 - a);
+				console.log("v1x = " + v1x + "\nv2x = " + v2x + "\nv1y = " + v1y + "\nv2y = " + v2y);
+				//Final velocity
+				m1 = b1.mass;
+				console.log("m1 = " + m1);
+				m2 = b2.mass;
+				console.log("m2 = " + m2);
+				f1x = (v1x*(m1 - m2)) + 2*(m2 * v2x) / (m1 + m2);
+				f2x = (v2x*(m1 - m2)) + 2*(m2 * v1x) / (m1 + m2);
+				console.log("f1x = " + f1x + "\nf2x = " + f2x);
+				//circle 1
+				newXVel1 = (Math.cos(a)*f1x) + (Math.cos(a+(Math.PI/2))*v1y);
+				newYVel1 = (Math.sin(a)*f1x) + (Math.cos(a+(Math.PI/2))*v1y);
+				console.log("newXVel1 = " + newXVel1 + "\nnewYVel1 = " + newYVel1);
+				//circle 2
+				newXVel2 = (Math.cos(a)*f2x) + (Math.cos(a+(Math.PI/2))*v2y);
+				newYVel2 = (Math.sin(a)*f2x) + (Math.cos(a+(Math.PI/2))*v2y);
+				console.log("newXVel2 = " + newXVel2 + "\nnewYVel2 = " + newYVel2);
+
+				b1.xspeed = newXVel1;
+				b1.yspeed = newYVel1;
+				b2.xspeed = newXVel2;
+				b2.yspeed = newYVel2;
+
+				if(distance < (35)){
+					b1.relocate();
+					b2.relocate();
+				}
 			}
 		}
 		
@@ -222,14 +297,11 @@
                 console.log('t key pressed!');
                 b1.rotateSpeed -= 0.001;
                 b2.rotateSpeed -= 0.001;
-				break;
-            
-           }	
-			
+				break;        
+           }				
 		});
 		
 		//MOUSE CONTROL
-		
 		var canvasPos = {
 			x: canvas.offsetLeft,
 			y: canvas.offsetTop
@@ -237,7 +309,16 @@
 		
 		//DOUBLE CLICK EVENT
 		$( "#canvas-for-ball" ).dblclick(function() {
-			var mouse = {
+			//Random reposition.
+			randXY();
+			b1.x = randX;
+			b1.y = randY;
+			randXY();
+			b2.x = randX;
+			b2.y = randY;
+
+			//Reposition to cursor position
+			/*var mouse = {
 				x:event.pageX - canvasPos.x,
 				y:event.pageY - canvasPos.y
 			}
@@ -253,7 +334,7 @@
 			b2.y = (mouse.y);
 			b2.xspeed = 1.4;
 			b2.yspeed = 1.4;
-            b2.rotateSpeed = 0.01;
+            b2.rotateSpeed = 0.01;*/
 		});
     </script>
 
