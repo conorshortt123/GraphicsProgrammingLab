@@ -47,14 +47,22 @@
 		var line1Radian = 0.25;
 		var line2Radian = 0.75;
 		
+		var color;
+		var mass = 1;
+		var num;
+		var distance;
+		
 		//Ball class
 		class Ball {
-			constructor(x, y, xspeed, yspeed, rotateSpeed) {
+			constructor(x, y, xspeed, yspeed, rotateSpeed, mass, color, num) {
 				this.x = x;
 				this.y = y;
 				this.xspeed = xspeed;
 				this.yspeed = yspeed;
 				this.rotateSpeed = rotateSpeed;
+				this.mass = mass;
+				this.color = color;
+				this.num = num;
 			}
 			draw(){
 				ctx.beginPath();
@@ -78,14 +86,31 @@
 				a = (radius * Math.cos(Math.PI * line2Radian) + this.x);
 				b = radius * Math.sin(Math.PI * line2Radian);
 				ctx.moveTo(this.x, this.y);
-				ctx.lineTo(a, (b +this.y));
-				
+				ctx.lineTo(a, (b +this.y));		
 				ctx.lineWidth = 2;
+				
+				switch(this.num){
+					case 1:
+						this.color = 'red';
+						break;
+					case 2:
+						this.color = 'green';
+						break;
+					case 3:
+						this.color = 'blue';
+						break;
+					case 4:
+						this.color = 'yellow';
+						break;
+				}
+				
+				ctx.strokeStyle = this.color;
 				ctx.stroke();
 			}
 			move(){
 				// Update the y location.
 				this.y += this.yspeed;
+				//gravity is const
 				this.yspeed += gravity;
 				if(this.y > (height-radius)) {
 					this.yspeed *= -1;
@@ -95,7 +120,6 @@
                         this.rotateSpeed = 0;
                         this.xspeed *= 0.99;
                     }
-                    console.log(this.yspeed);
 				} else if(this.y < radius) {
 					this.yspeed *= -1;
 				}
@@ -116,73 +140,102 @@
 			}
 		}
 		
-        var randX = Math.floor(Math.random() * 300);
-        var randY = Math.floor(Math.random() * 100);
-        
-		var theBall = new Ball(randX, randY, 1, 0, 0.01);
-        var otherBall = new Ball(200, 100, 1.5, 0, 0.01);
+        var randX = Math.floor(Math.random() * (width - 20));
+        var randY = Math.floor(Math.random() * (height - 20));
+		
+		num = Math.ceil(Math.random() * 3);
+		var b1 = new Ball(randX, randY, 1.5, 0, 0.01, 2, 0, num);
+        var b2 = new Ball(200, 100, 1, 0, 0.01, 2, 0, 4);
 		
 		//keypresses with jQuery
 		function repeatme() {
 			ctx.clearRect(0, 0, width, height);
 
-			theBall.draw();
-			theBall.move();
-			theBall.rotate();
+			b1.draw();
+			b1.move();
+			b1.rotate();
                    
-            otherBall.draw();
-			otherBall.move();
-			otherBall.rotate();
+            b2.draw();
+			b2.move();
+			b2.rotate();
+			
+			checkCollisions();
 			
 			window.requestAnimationFrame(repeatme);
 		}
+		
+		function checkCollisions() {
+			var x3 = b2.x - b1.x;
+			var y3 = b2.y - b1.y;
+			var x3sqrd = Math.pow(x3, 2);
+			var y3sqrd = Math.pow(y3, 2);
+			var radiiSum = radius * 2;
+			
+			distance = Math.sqrt(x3sqrd + y3sqrd);
+			if(distance < radiiSum){
+				console.log("collision");
+				
+			}
+		}
+		
 		repeatme();
 		
+		//KEYBOARD CONTROLS
 		$(document.body).on('keydown', function(e2) {
 			console.log(e2.which);
 			switch (e2.which) {
             // key code for space key
 			case 32:
-				theBall.rotateSpeed *= -1;
+				b1.rotateSpeed *= -1;
+				b2.rotateSpeed *= -1;
 				break;
 			// key code for a key
 			case 65:
 				console.log('a key pressed!');
-				theBall.xspeed -= 1;
+				b1.xspeed -= 1;
+				b2.xspeed -= 1;
 				break;
 			// key code for d key
 			case 68:
 				console.log('d key pressed!');
-				theBall.xspeed += 1;
+				b1.xspeed += 1;
+				b2.xspeed += 1;
 				break;
 			// key code for w key
 			case 87:
 				console.log('w key pressed!');
-				theBall.yspeed -= 1;
+				b1.yspeed -= 1;
+				b2.yspeed -= 1;
 				break;
 			// key code for s key
 			case 83:
 				console.log('s key pressed!');
-				theBall.yspeed += 1;
+				b1.yspeed += 1;
+				b2.yspeed += 1;
 				break;
             case 82:
                 console.log('r key pressed!');
-                theBall.rotateSpeed += 0.001;
-                break;
+                b1.rotateSpeed += 0.001;
+                b2.rotateSpeed += 0.001;
+				break;
             case 84:
                 console.log('t key pressed!');
-                theBall.rotateSpeed -= 0.001;
-                break;
+                b1.rotateSpeed -= 0.001;
+                b2.rotateSpeed -= 0.001;
+				break;
             
            }	
 			
 		});
+		
+		//MOUSE CONTROL
 		
 		var canvasPos = {
 			x: canvas.offsetLeft,
 			y: canvas.offsetTop
 		}
 		
+		//DOUBLE CLICK EVENT
 		$( "#canvas-for-ball" ).dblclick(function() {
 			var mouse = {
 				x:event.pageX - canvasPos.x,
@@ -190,17 +243,17 @@
 			}
 			
 			ctx.clearRect(0, 0, width, height);
-			theBall.x = (mouse.x);
-			theBall.y = (mouse.y);
-			theBall.xspeed = 1;
-			theBall.yspeed = 1;
-            theBall.rotateSpeed = 0.01;
+			b1.x = (mouse.x);
+			b1.y = (mouse.y);
+			b1.xspeed = 1;
+			b1.yspeed = 1;
+            b1.rotateSpeed = 0.01;
             
-            otherBall.x = (mouse.x);
-			otherBall.y = (mouse.y);
-			otherBall.xspeed = 1.4;
-			otherBall.yspeed = 1.4;
-            otherBall.rotateSpeed = 0.01;
+            b2.x = (mouse.x);
+			b2.y = (mouse.y);
+			b2.xspeed = 1.4;
+			b2.yspeed = 1.4;
+            b2.rotateSpeed = 0.01;
 		});
     </script>
 
