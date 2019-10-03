@@ -27,6 +27,8 @@
 
     <canvas id="canvas-for-ball" width="600" height="300"></canvas>
 
+	<p>-Balls will sometimes be automatically repositioned as there is a glitch where they get stuck together.</p>
+
     <script type="text/javascript">
 		// Gets a handle to the element with id canvasOne.
 		var canvas = document.getElementById("canvas-for-ball");
@@ -38,7 +40,7 @@
 	    const height = 300;
 	    var radius = 20;
 	    var x, y, xspeed, yspeed, rotateSpeed;
-		const gravity = 0.05;
+		const gravity = 0.01;
 		var a, b;
 		var circleRadian = 2;
 		var middleBottom = 0.5;
@@ -47,6 +49,9 @@
 		var line2Radian = 0.75;
 		var randX;
 		var randY;
+		var i, z;
+		const numBalls = 5;
+		let balls = [];
 		
 		var energyLoss = 0.9;
 		var mass = radius / 10;
@@ -161,25 +166,24 @@
 			if(randY < 20)
 			randY += 20;
 		}
-		
-        randXY();
-		randColor();
-		var b1 = new Ball(randX, randY, 1.5, 1, 20, 0.01, 2, color);
-		randXY();
-        randColor();
-		var b2 = new Ball(randX, randY, 1.5, 1, 20, 0.01, 2, color);
-		
+
+		//Loop for pushing multiple instances of class "Ball" to array "balls"
+		for(i = 0; i < numBalls; i++){
+			randXY();
+			randColor();
+			balls.push(new Ball(randX, randY, 1, 1, 20, 0.001, 1, color));
+		}
+		console.log(b);
+
 		//keypresses with jQuery
 		function repeatme() {
 			ctx.clearRect(0, 0, width, height);
 
-			b1.draw();
-			b1.move();
-			b1.rotate();
-                   
-            b2.draw();
-			b2.move();
-			b2.rotate();
+			for(i = 0; i < numBalls; i++){
+				balls[i].draw();
+				balls[i].move();
+				balls[i].rotate();
+			}
 			
 			checkCollision();
 			
@@ -187,70 +191,76 @@
 		}
 		
 		function checkCollision() {
-			var x3 = b2.x - b1.x;
-			var y3 = b2.y - b1.y;
-			var x3sqrd = Math.pow(x3, 2);
-			var y3sqrd = Math.pow(y3, 2);
 			var radiiSum = radius * 2;
-			
-			distance = Math.sqrt(x3sqrd + y3sqrd);
 
-			if(distance <= (radiiSum)){
-				//Collision detected
-				console.log("collision");
+			if(balls.length > 1) {
+				for(i = 0; i < numBalls; i++) {
+					for(z = (i+1); z < numBalls; z++){
 
-				//Random color for each ball.
-				randColor();
-				b1.color = color;
-				randColor();
-				b2.color = color;
+						distance = Math.sqrt(Math.pow((balls[z].x - balls[i].x), 2) + Math.pow((balls[z].y - balls[i].y), 2));
 
-				//Calculate collision angle (a)
-				a = Math.atan2((b1.y - b2.y)-0.5, (b2.x - b2.y)-0.5);
-				console.log("collision angle = " + a);
-				//Calculate magnitude (u)
-				u1 = Math.sqrt(Math.pow(b1.xspeed, 2) + Math.pow(b1.yspeed, 2));
-				u2 = Math.sqrt(Math.pow(b2.xspeed, 2) + Math.pow(b2.yspeed, 2));
-				console.log("b1 magnitude = " + u1);
-				console.log("b2 magnitude = " + u2);
-				//Calculate direction (d)
-				d1 = Math.atan2(b1.yspeed, b1.xspeed);
-				console.log("d1 = " + d1);
-				d2 = Math.atan2(b2.yspeed, b2.xspeed);
-				console.log("d2 = " + d2);
-				//Calculate x/y velocity
-				v1x = u1 * Math.cos(d1 - a);
-				v1y = u1 * Math.sin(d1 - a);
-				v2x = u2 * Math.cos(d2 - a);
-				v2y = u2 * Math.sin(d2 - a);
-				console.log("v1x = " + v1x + "\nv2x = " + v2x + "\nv1y = " + v1y + "\nv2y = " + v2y);
-				//Final velocity
-				m1 = b1.mass;
-				console.log("m1 = " + m1);
-				m2 = b2.mass;
-				console.log("m2 = " + m2);
-				f1x = (v1x*(m1 - m2)) + 2*(m2 * v2x) / (m1 + m2);
-				f2x = (v2x*(m1 - m2)) + 2*(m2 * v1x) / (m1 + m2);
-				console.log("f1x = " + f1x + "\nf2x = " + f2x);
-				//circle 1
-				newXVel1 = (Math.cos(a)*f1x) + (Math.cos(a+(Math.PI/2))*v1y);
-				newYVel1 = (Math.sin(a)*f1x) + (Math.cos(a+(Math.PI/2))*v1y);
-				console.log("newXVel1 = " + newXVel1 + "\nnewYVel1 = " + newYVel1);
-				//circle 2
-				newXVel2 = (Math.cos(a)*f2x) + (Math.cos(a+(Math.PI/2))*v2y);
-				newYVel2 = (Math.sin(a)*f2x) + (Math.cos(a+(Math.PI/2))*v2y);
-				console.log("newXVel2 = " + newXVel2 + "\nnewYVel2 = " + newYVel2);
+						if(distance <= (radiiSum)){
+							//Collision detected
+						//	console.log("distance = " + distance);
+							
+							//Random color for each ball.
+							randColor();
+							balls[i].color = color;
+							randColor();
+							balls[z].color = color;
 
-				b1.xspeed = newXVel1;
-				b1.yspeed = newYVel1;
-				b2.xspeed = newXVel2;
-				b2.yspeed = newYVel2;
+							//Calculate collision angle (a)
+							a = Math.atan2((balls[i].y - balls[z].y)-0.5, (balls[z].x - balls[z].y)-0.5);
+						//	console.log("collision angle = " + a);
+							//Calculate magnitude (u)
+							u1 = Math.sqrt(Math.pow(balls[i].xspeed, 2) + Math.pow(balls[i].yspeed, 2));
+							u1 *= energyLoss;
+							u2 = Math.sqrt(Math.pow(balls[z].xspeed, 2) + Math.pow(balls[z].yspeed, 2));
+							u2 *= energyLoss;
+						//	console.log("b" + (i) + " magnitude = " + u1);
+						//	console.log("b" + (z) + " magnitude = " + u2);
+							//Calculate direction (d)
+							d1 = Math.atan2(balls[i].yspeed, balls[i].xspeed);
+						//	console.log("d1 = " + d1);
+							d2 = Math.atan2(balls[z].yspeed, balls[z].xspeed);
+						//	console.log("d2 = " + d2);
+							//Calculate x/y velocity
+							v1x = u1 * Math.cos(d1 - a);
+							v1y = u1 * Math.sin(d1 - a);
+							v2x = u2 * Math.cos(d2 - a);
+							v2y = u2 * Math.sin(d2 - a);
+						//	console.log("v1x = " + v1x + "\nv2x = " + v2x + "\nv1y = " + v1y + "\nv2y = " + v2y);
+							//Final velocity
+							m1 = balls[i].mass;
+						//	console.log("m1 = " + m1);
+							m2 = balls[z].mass;
+						//	console.log("m2 = " + m2);
+							f1x = (v1x*(m1 - m2)) + 2*(m2 * v2x) / (m1 + m2);
+							f2x = (v2x*(m1 - m2)) + 2*(m2 * v1x) / (m1 + m2);
+						//	console.log("f1x = " + f1x + "\nf2x = " + f2x);
+							//circle 1
+							newXVel1 = (Math.cos(a)*f1x) + (Math.cos(a+(Math.PI/2))*v1y);
+							newYVel1 = (Math.sin(a)*f1x) + (Math.cos(a+(Math.PI/2))*v1y);
+						//	console.log("newXVel1 = " + newXVel1 + "\nnewYVel1 = " + newYVel1);
+							//circle 2
+							newXVel2 = (Math.cos(a)*f2x) + (Math.cos(a+(Math.PI/2))*v2y);
+							newYVel2 = (Math.sin(a)*f2x) + (Math.cos(a+(Math.PI/2))*v2y);
+						//	console.log("newXVel2 = " + newXVel2 + "\nnewYVel2 = " + newYVel2);
 
-				if(distance < (35)){
-					b1.relocate();
-					b2.relocate();
+							balls[i].xspeed = newXVel1;
+							balls[i].yspeed = newYVel1;
+							balls[z].xspeed = newXVel2;
+							balls[z].yspeed = newYVel2;
+
+							if(distance < 36){
+								balls[i].relocate();
+								balls[z].relocate();
+							}
+						}
+					}
 				}
 			}
+
 		}
 		
 		repeatme();
@@ -261,43 +271,50 @@
 			switch (e2.which) {
             // key code for space key
 			case 32:
-				b1.rotateSpeed *= -1;
-				b2.rotateSpeed *= -1;
+				for(i = 0; i < numBalls; i++){
+					balls[i].rotateSpeed *= -1;
+				}
 				break;
 			// key code for a key
 			case 65:
 				console.log('a key pressed!');
-				b1.xspeed -= 1;
-				b2.xspeed -= 1;
+				for(i = 0; i < 	numBalls; i++){
+					balls[i].xspeed -= 1;
+				}
 				break;
 			// key code for d key
 			case 68:
 				console.log('d key pressed!');
-				b1.xspeed += 1;
-				b2.xspeed += 1;
+				for(i = 0; i < numBalls; i++){
+					balls[i].xspeed += 1;
+				}
 				break;
 			// key code for w key
 			case 87:
 				console.log('w key pressed!');
-				b1.yspeed -= 1;
-				b2.yspeed -= 1;
+				for(i = 0; i < numBalls; i++){
+					balls[i].yspeed -= 1;
+				}
 				break;
 			// key code for s key
 			case 83:
 				console.log('s key pressed!');
-				b1.yspeed += 1;
-				b2.yspeed += 1;
+				for(i = 0; i < numBalls; i++){
+					balls[i].yspeed += 1;
+				}
 				break;
             case 82:
                 console.log('r key pressed!');
-                b1.rotateSpeed += 0.001;
-                b2.rotateSpeed += 0.001;
-				break;
+				for(i = 0; i < numBalls; i++){
+					balls[i].rotateSpeed += 0.001;
+				}
+                break;
             case 84:
                 console.log('t key pressed!');
-                b1.rotateSpeed -= 0.001;
-                b2.rotateSpeed -= 0.001;
-				break;        
+				for(i = 0; i < numBalls; i++){
+					balls[i].rotateSpeed -= 0.001;
+				}
+                break;
            }				
 		});
 		
@@ -309,13 +326,14 @@
 		
 		//DOUBLE CLICK EVENT
 		$( "#canvas-for-ball" ).dblclick(function() {
-			//Random reposition.
-			randXY();
-			b1.x = randX;
-			b1.y = randY;
-			randXY();
-			b2.x = randX;
-			b2.y = randY;
+			//Random reposition.	
+			for(i = 0; i < numBalls; i++){
+				randXY();
+				balls[i].x = randX;
+				balls[i].y = randY;
+				balls[i].xspeed = 1;
+				balls[i].yspeed = 1;
+			}
 
 			//Reposition to cursor position
 			/*var mouse = {

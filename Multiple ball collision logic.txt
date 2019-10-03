@@ -1,0 +1,13 @@
+balls = [5]
+
+var i, z;
+
+for(i=0 i<4 i++) {
+	for(z=0 z<4 z++){
+		d = Math.sqrt(Math.pow((balls[z].x - balls[i].x), 2) + Math.pow((balls[z].y - balls[i].y), 2));
+
+		if(d <= radiiSum){
+			console.log("collision");
+		}
+	}
+}
