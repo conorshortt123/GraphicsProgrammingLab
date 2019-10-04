@@ -18,7 +18,7 @@
 		transform: rotate(270deg);
 		}
 		.slidecontainer{
-			margin-left: 600px;
+			margin-left: 1000px;
 		}
 
     </style>
@@ -35,7 +35,7 @@
 	<br>-Adjust slider on right hand side of canvas to increase/decrease the number of balls.
     </p>
 
-    <canvas id="canvas-for-ball" width="600" height="300"></canvas>
+    <canvas id="canvas-for-ball" width="1000" height="500"></canvas>
 
 	<p>-Balls will sometimes be automatically repositioned as there is a glitch where they get stuck together.</p>
 	<br>
@@ -50,11 +50,12 @@
 		var ctx = canvas.getContext("2d");
 
 		//Variables & Constants
-	    const width = 600;
-	    const height = 300;
+	    const width = canvas.width;
+	    const height = canvas.height;
 	    var radius = 20;
 	    var x, y, xspeed, yspeed, rotateSpeed;
-		const gravity = 0.01;
+		const gravity = 0.02;
+		var gravAccel;
 		var a, b;
 		var circleRadian = 2;
 		var middleBottom = 0.5;
@@ -120,8 +121,10 @@
 			move(){
 				// Update the y location.
 				this.y += this.yspeed;
-				//gravity is const
-				this.yspeed += gravity;
+				//Gravity calc
+				gravAccel = this.mass * gravity;
+				console.log(gravAccel);
+				this.yspeed += gravAccel;
 				if(this.y >= (height-radius)) {
 					this.yspeed *= -1;
 					//Kinetic energy loss. (90%)
@@ -160,8 +163,6 @@
 				this.y = randY;
 			}
 		}
-
-		var color;
 
 		//Random color function
 		function randColor() {
@@ -274,6 +275,10 @@
 							if(distance < 36){
 								balls[i].relocate();
 								balls[z].relocate();
+								balls[i].xspeed = 1;
+								balls[i].yspeed = 1;
+								balls[z].xspeed = 1;
+								balls[z].yspeed = 1;
 							}
 						}
 					}
