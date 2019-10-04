@@ -12,6 +12,15 @@
 			border: 2px solid red;
 			background-color: black;
 		}
+		input[type="range"] {
+		position: absolute;
+		top: 40%;
+		transform: rotate(270deg);
+		}
+		.slidecontainer{
+			margin-left: 600px;
+		}
+
     </style>
 
   </head>
@@ -23,11 +32,16 @@
     <br>-SPACE to change rotation direction.
     <br>-Double click to reposition.
     <br>-R to increase rotational velocity & T to decrease.
+	<br>-Adjust slider on right hand side of canvas to increase/decrease the number of balls.
     </p>
 
     <canvas id="canvas-for-ball" width="600" height="300"></canvas>
 
 	<p>-Balls will sometimes be automatically repositioned as there is a glitch where they get stuck together.</p>
+	<br>
+	<div class="slidecontainer">
+  		<input type="range" min="1" max="10" value="10" class="slider" id="myRange">
+	</div>
 
     <script type="text/javascript">
 		// Gets a handle to the element with id canvasOne.
@@ -50,7 +64,8 @@
 		var randX;
 		var randY;
 		var i, z;
-		const numBalls = 5;
+		var numBalls = 1;
+		numBalls = document.getElementById("myRange");
 		let balls = [];
 		
 		var energyLoss = 0.9;
@@ -146,6 +161,8 @@
 			}
 		}
 
+		var color;
+
 		//Random color function
 		function randColor() {
 
@@ -168,10 +185,12 @@
 		}
 
 		//Loop for pushing multiple instances of class "Ball" to array "balls"
-		for(i = 0; i < numBalls; i++){
+		mass = 1;
+		for(i = 0; i < numBalls.value; i++){
 			randXY();
 			randColor();
-			balls.push(new Ball(randX, randY, 1, 1, 20, 0.001, 1, color));
+			balls.push(new Ball(randX, randY, 1, 1, 20, 0.001, mass, color));
+			mass += 0.1;
 		}
 		console.log(b);
 
@@ -179,7 +198,7 @@
 		function repeatme() {
 			ctx.clearRect(0, 0, width, height);
 
-			for(i = 0; i < numBalls; i++){
+			for(i = 0; i < numBalls.value; i++){
 				balls[i].draw();
 				balls[i].move();
 				balls[i].rotate();
@@ -194,8 +213,8 @@
 			var radiiSum = radius * 2;
 
 			if(balls.length > 1) {
-				for(i = 0; i < numBalls; i++) {
-					for(z = (i+1); z < numBalls; z++){
+				for(i = 0; i < numBalls.value; i++) {
+					for(z = (i+1); z < numBalls.value; z++){
 
 						distance = Math.sqrt(Math.pow((balls[z].x - balls[i].x), 2) + Math.pow((balls[z].y - balls[i].y), 2));
 
@@ -271,47 +290,47 @@
 			switch (e2.which) {
             // key code for space key
 			case 32:
-				for(i = 0; i < numBalls; i++){
+				for(i = 0; i < numBalls.value; i++){
 					balls[i].rotateSpeed *= -1;
 				}
 				break;
 			// key code for a key
 			case 65:
 				console.log('a key pressed!');
-				for(i = 0; i < 	numBalls; i++){
+				for(i = 0; i < 	numBalls.value; i++){
 					balls[i].xspeed -= 1;
 				}
 				break;
 			// key code for d key
 			case 68:
 				console.log('d key pressed!');
-				for(i = 0; i < numBalls; i++){
+				for(i = 0; i < numBalls.value; i++){
 					balls[i].xspeed += 1;
 				}
 				break;
 			// key code for w key
 			case 87:
 				console.log('w key pressed!');
-				for(i = 0; i < numBalls; i++){
+				for(i = 0; i < numBalls.value; i++){
 					balls[i].yspeed -= 1;
 				}
 				break;
 			// key code for s key
 			case 83:
 				console.log('s key pressed!');
-				for(i = 0; i < numBalls; i++){
+				for(i = 0; i < numBalls.value; i++){
 					balls[i].yspeed += 1;
 				}
 				break;
             case 82:
                 console.log('r key pressed!');
-				for(i = 0; i < numBalls; i++){
+				for(i = 0; i < numBalls.value; i++){
 					balls[i].rotateSpeed += 0.001;
 				}
                 break;
             case 84:
                 console.log('t key pressed!');
-				for(i = 0; i < numBalls; i++){
+				for(i = 0; i < numBalls.value; i++){
 					balls[i].rotateSpeed -= 0.001;
 				}
                 break;
@@ -327,7 +346,7 @@
 		//DOUBLE CLICK EVENT
 		$( "#canvas-for-ball" ).dblclick(function() {
 			//Random reposition.	
-			for(i = 0; i < numBalls; i++){
+			for(i = 0; i < numBalls.value; i++){
 				randXY();
 				balls[i].x = randX;
 				balls[i].y = randY;
