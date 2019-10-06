@@ -68,6 +68,7 @@
 		var numBalls = 1;
 		numBalls = document.getElementById("myRange");
 		let balls = [];
+		var seperated = false;
 		
 		var energyLoss = 0.9;
 		var mass = radius / 10;
@@ -129,23 +130,20 @@
 					this.yspeed *= -1;
 					//Kinetic energy loss. (90%)
                     this.yspeed *= energyLoss;
-					//Checks if y velocity is excessively low, (between 1 and -1) and sets to 0 if true.
-					//Also decreases rotation velocity and x velocity.
-                    /*if(this.yspeed < 1 && this.yspeed > -1){
-                        this.yspeed = 0;
-                        this.rotateSpeed *= 0.99;
-                        this.xspeed *= 0.99;
-                    }*/
+					this.y = (height - radius) - 1;
 				} else if(this.y <= radius) {
 					this.yspeed *= -1;
 					this.yspeed *= energyLoss;
+					this.y = (radius + 1);
 				}
 				// Update the x location.
 				this.x += this.xspeed;
 				if(this.x >= (width-radius)) {
+					this.x = (width - radius) - 1;
 					this.xspeed *= -1;
 					this.xspeed *= energyLoss;
 				} else if(this.x <= radius) {
+					this.x = (radius + 1);
 					this.xspeed *= -1;
 					this.xspeed *= energyLoss;
 				}
@@ -272,14 +270,7 @@
 							balls[z].xspeed = newXVel2;
 							balls[z].yspeed = newYVel2;
 
-							if(distance < 36){
-								balls[i].relocate();
-								balls[z].relocate();
-								balls[i].xspeed = 1;
-								balls[i].yspeed = 1;
-								balls[z].xspeed = 1;
-								balls[z].yspeed = 1;
-							}
+							distance = 41;
 						}
 					}
 				}
